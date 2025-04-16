@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>AI All</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='80' fill='gold' font-weight='bold'>A</text></svg>">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(to bottom, #a48ccf, #2d124d);
+      font-family: "微軟正黑體", "Heiti TC", sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    header {
+      width: 100%;
+      padding: 50px 20px 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 52px;
+      font-weight: 900;
+      color: gold;
+      margin: 0;
+      text-shadow: 2px 2px 6px rgba(0,0,0,0.6);
+    }
+
+    .input-container {
+      position: relative;
+      flex-grow: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 0px 20px 160px;
+      width: 100%;
+    }
+
+    textarea {
+      width: 80%;
+      max-width: 800px;
+      height: 200px;
+      padding: 20px;
+      font-size: 18px;
+      border: none;
+      border-radius: 12px;
+      background-color: #e0e0e0;
+      resize: vertical;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    textarea:focus {
+      outline: none;
+      box-shadow: 0 0 8px 2px rgba(255, 215, 0, 0.5);
+    }
+
+    .button-group {
+      position: absolute;
+      bottom: 120px;
+      right: 12%;
+      display: flex;
+      gap: 14px;
+    }
+
+    .icon-button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      width: 52px;
+      height: 52px;
+      transition: transform 0.2s;
+    }
+
+    .icon-button:hover {
+      transform: scale(1.1);
+    }
+
+    .icon-button img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+	.utility-buttons {
+	  display: flex;
+	  flex-direction: row;
+	  justify-content: center;
+	  flex-wrap: wrap;
+	  margin-top: 20px;
+	  gap: 10px;
+	}
+
+	.utility-buttons button {
+		background-color: #d0eaff;
+		color: #003366;
+		font-size: 16px;
+		font-weight: bold;
+		border: none;
+		border-radius: 6px;
+		padding: 10px 20px;
+		width: 280px;
+		cursor: pointer;
+		box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+		transition: background-color 0.2s;
+	}
+
+	.utility-buttons button:hover {
+		background-color: #b3daff;
+	}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>整合式 AI 9.0 大哉問</h1>
+  </header>
+
+  <div class="utility-buttons">
+	<button onclick="insertPrompt('以正式嚴謹語氣重新撰寫:')">以正式嚴謹語氣重新撰寫:</button>
+	<button onclick="insertPrompt('尋找下面內容出處:')">尋找下面內容出處:</button>
+	<button onclick="insertPrompt('比較下面內容優缺點:')">比較下面內容優缺點:</button>
+  </div>
+
+  <div class="input-container">
+    <textarea id="question" placeholder="請輸入你的大哉問，可換行輸入…"></textarea>
+
+    <div class="button-group">
+      <!-- ChatGPT：太陽 -->
+      <button class="icon-button" onclick="searchOne('chatgpt')" title="ChatGPT">
+        <img src="https://cdn-icons-png.flaticon.com/512/869/869869.png" alt="太陽">
+      </button>
+
+      <!-- GROK：太空梭 -->
+      <button class="icon-button" onclick="searchOne('grok')" title="GROK">
+        <img src="https://cdn-icons-png.flaticon.com/256/1356/1356479.png" alt="太空梭">
+      </button>
+
+      <!-- Perplexity：星星 -->
+      <button class="icon-button" onclick="searchOne('perplexity')" title="Perplexity">
+        <img src="https://cdn-icons-png.flaticon.com/512/1828/1828884.png" alt="星星">
+      </button>
+
+      <!-- Google：舔狗 -->
+      <button class="icon-button" onclick="searchOne('google')" title="Google">
+        <img src="https://cdn-icons-png.flaticon.com/256/2171/2171990.png" alt="舔狗">
+      </button>
+    </div>
+  </div>
+
+  <script>
+    function searchOne(engine) {
+      const text = document.getElementById('question').value.trim();
+      if (!text) return;
+
+      const query = encodeURIComponent(text);
+      let url = "";
+
+      switch(engine) {
+        case 'chatgpt':
+          url = `https://chat.openai.com/?q=${query}`;
+          break;
+        case 'grok':
+          // 嵌入中介跳轉頁（同網頁）
+          url = `${location.origin}${location.pathname}#grok?q=${query}`;
+          window.open(url, "_blank");
+          return;
+        case 'perplexity':
+          url = `https://www.perplexity.ai/search?q=${query}`;
+          break;
+        case 'google':
+          url = `https://www.google.com/search?q=${query}`;
+          break;
+      }
+
+      if (url) window.open(url, '_blank');
+    }
+
+    // 如果使用 hash 啟動 grok redirect 介面
+    window.addEventListener("load", () => {
+      if (location.hash.startsWith("#grok")) {
+        const params = new URLSearchParams(location.hash.replace("#grok?", ""));
+        const query = decodeURIComponent(params.get("q") || "");
+
+        document.body.innerHTML = `
+          <style>
+            body {
+              background-color: #1c1c2e;
+              color: #fff;
+              font-family: sans-serif;
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              align-items: center;
+              height: 100vh;
+              text-align: center;
+              padding: 20px;
+            }
+            .box {
+              background-color: #2f2f4f;
+              padding: 20px;
+              border-radius: 10px;
+              max-width: 600px;
+            }
+            textarea {
+              width: 100%;
+              height: 120px;
+              font-size: 16px;
+              margin-top: 10px;
+              padding: 10px;
+              border-radius: 8px;
+              border: none;
+              background-color: #444;
+              color: white;
+            }
+            button {
+              margin-top: 15px;
+              padding: 10px 20px;
+              font-size: 16px;
+              border: none;
+              border-radius: 8px;
+              background-color: #5e60ce;
+              color: white;
+              cursor: pointer;
+            }
+            button:hover {
+              background-color: #7678ed;
+            }
+          </style>
+          <div class="box">
+            <h1>即將轉往 GROK</h1>
+            <p>請將以下內容貼到 GROK 搜尋欄中：</p>
+            <textarea readonly>${query}</textarea>
+            <button onclick="window.open('https://grok.x.ai', '_blank')">前往 GROK</button>
+          </div>
+        `;
+      }
+    });
+	function insertPrompt(text) {
+		const textarea = document.getElementById('question');
+		textarea.value += (textarea.value ? '\n' : '') + text;
+		textarea.focus();
+}
+  </script>
+</body>
+</html>
